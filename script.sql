@@ -34,7 +34,7 @@ CREATE TABLE Reservations (
 -- Example of inserting --
 
 
-INSERT INTO Membres (FirstName, LastName, Phone, Email) VALUES
+INSERT INTO Members (FirstName, LastName, Phone, Email) VALUES
 ('Mohammed', 'CHAMKHI', '212-636-253939', 'theshamkhi1@gmail.com'),
 ('Khadija', 'SAHNOUN', '123-456-789', 'khadija.sahnoun@gmail.com');
 
