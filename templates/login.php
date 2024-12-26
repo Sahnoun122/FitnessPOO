@@ -1,7 +1,8 @@
 <?php
-session_start();
 require_once '../models/classes.php';
 require_once '../config/db.php';
+
+session_start();
 
 $auth = new Auth();
 
@@ -26,17 +27,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login</title>
-</head>
-<body>
-    <form method="POST" action="login.php">
-        <input type="text" name="username" placeholder="Username" required><br>
-        <input type="password" name="password" placeholder="Password" required><br>
-        <button type="submit">Login</button>
-    </form>
-</body>
-</html>

@@ -18,6 +18,7 @@ class Auth extends DbConnection {
                 ':password' => $hashedPassword,
                 ':role' => $role
             ]);
+            
 
             $userId = $this->connection->lastInsertId();
 
