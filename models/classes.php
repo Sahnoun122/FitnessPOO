@@ -3,7 +3,7 @@ require_once '../config/db.php';
 
 class Auth extends DbConnection {
 
-    public function register($username, $password, $firstname, $lastname, $phone, $email, $role = 'Member') {
+    public function register($username, $password, $name, $phone, $email, $role = 'Member') {
         try {
             $this->connection->beginTransaction();
 
@@ -22,12 +22,11 @@ class Auth extends DbConnection {
             $userId = $this->connection->lastInsertId();
 
             if ($role === 'Member') {
-                $sqlMember = "INSERT INTO Members (MemberID, FirstName, LastName, Phone, Email) VALUES (:id, :firstname, :lastname, :phone, :email)";
+                $sqlMember = "INSERT INTO Members (MemberID, Name, Phone, Email) VALUES (:id, :name, :phone, :email)";
                 $stmtMember = $this->connection->prepare($sqlMember);
                 $stmtMember->execute([
                     ':id' => $userId,
-                    ':firstname' => $firstname,
-                    ':lastname' => $lastname,
+                    ':name' => $name,
                     ':phone' => $phone,
                     ':email' => $email
                 ]);
@@ -102,24 +101,19 @@ class User {
 
 
 class Member extends User {
-    private $firstname;
-    private $lastname;
+    private $name;
     private $phone;
     private $email;
 
-    public function __construct($id, $username, $password, $firstname, $lastname, $phone, $email) {
+    public function __construct($id, $username, $password, $name, $phone, $email) {
         parent::__construct($id, $username, $password, 'Member');
-        $this->firstname = $firstname;
-        $this->lastname = $lastname;
+        $this->name = $name;
         $this->phone = $phone;
         $this->email = $email;
     }    
 
-    public function getFirstName() {
-        return $this->firstname;
-    }
-    public function getLastName() {
-        return $this->lastname;
+    public function getName() {
+        return $this->name;
     }
     public function getPhone() {
         return $this->phone;
@@ -129,11 +123,8 @@ class Member extends User {
     }
 
 
-    public function setFirstName($firstname) {
-        $this->firstname = $firstname;
-    }
-    public function setLastName($lastname) {
-        $this->lastname = $lastname;
+    public function setName($name) {
+        $this->name = $name;
     }
     public function setPhone($phone) {
         $this->phone = $phone;
@@ -143,7 +134,7 @@ class Member extends User {
     }
 
     public function afficherInformations() {
-        return "Member: {$this->firstname} {$this->lastname}, Email: {$this->email}, Phone: {$this->phone}";
+        return "Member: {$this->name}, Email: {$this->email}, Phone: {$this->phone}";
     }
 }
 
