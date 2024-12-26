@@ -1,3 +1,6 @@
+CREATE DATABASE Gym;
+USE Gym;
+
 CREATE TABLE Users (
     UserID INT PRIMARY KEY AUTO_INCREMENT,
     Username VARCHAR(100),
@@ -15,6 +18,7 @@ CREATE TABLE Members (
 
 CREATE TABLE Activities (
     ActivityID INT AUTO_INCREMENT PRIMARY KEY,
+    PhotoURL VARCHAR(255),
     Name VARCHAR(255) NOT NULL,
     Description TEXT
 );
