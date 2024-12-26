@@ -14,7 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         $userId = $auth->register($username, $password, $name, $phone, $email, $role);
-        echo "Registration successful. Your User ID is: $userId";
         header('Location: login.php');
         exit();
     } catch (Exception $e) {
