@@ -32,21 +32,3 @@ CREATE TABLE Reservations (
     FOREIGN KEY (MemberID) REFERENCES Members(MemberID),
     FOREIGN KEY (ActivityID) REFERENCES Activities(ActivityID)
 );
-
-
--- Example of inserting --
-
-
-INSERT INTO Members (FirstName, LastName, Phone, Email) VALUES
-('Mohammed', 'CHAMKHI', '212-636-253939', 'theshamkhi1@gmail.com'),
-('Khadija', 'SAHNOUN', '123-456-789', 'khadija.sahnoun@gmail.com');
-
-INSERT INTO Activities (Name, Description) VALUES
-('Yoga', 'A relaxing activity focusing on stretching and mindfulness.'),
-('Spinning', 'A high-intensity cycling class for cardiovascular fitness.'),
-('Pilates', 'A low-impact exercise for flexibility, strength, and posture.'),
-('CrossFit', 'A high-intensity workout combining strength and cardio exercises.');
-
-INSERT INTO Reservations (MemberID, ActivityID, ResDate) VALUES 
-(1, 1, '2024-12-15 09:00:00'),
-(2, 2, '2024-12-16 10:30:00');
