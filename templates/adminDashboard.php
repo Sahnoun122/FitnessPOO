@@ -4,7 +4,6 @@ require_once '../config/db.php';
 
 session_start();
 
-// Redirect if user is not an admin
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'Admin') {
     header("Location: login.php");
     exit;
@@ -20,10 +19,12 @@ $stmt = $pdo->prepare($user_sql);
 $stmt->execute([':admin_id' => $admin_id]);
 $user = $stmt->fetch();
 
+
+// Form for Reserving an Activity
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reservation_id'], $_POST['action'])) {
     $reservation_id = $_POST['reservation_id'];
     $action = $_POST['action'];
-    $status = ($action === 'accept') ? 'accepted' : 'rejected';
+    $status = ($action === 'accept') ? 'Confirmed' : 'Cancelled';
 
     $update_sql = "UPDATE Reservations SET status = :status WHERE ResID = :reservation_id";
     $stmt_update = $pdo->prepare($update_sql);
@@ -33,16 +34,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reservation_id'], $_P
     ]);
 
     $_SESSION['message'] = "Reservation has been $status.";
-    header("Location: admin_dashboard.php");
+    header("Location: adminDashboard.php");
     exit;
 }
 
-$reservations_sql = "SELECT r.ResID, r.ResDate, r.status, u.Name AS MemberName, a.Name AS ActivityName 
+$reservations_sql = "SELECT r.ResID, r.ResDate, r.Status, u.Name AS MemberName, a.Name AS ActivityName 
                     FROM Reservations r
                     JOIN Members u ON r.MemberID = u.MemberID
                     JOIN Activities a ON r.ActivityID = a.ActivityID";
 $stmt_reservations = $pdo->query($reservations_sql);
 $reservations = $stmt_reservations->fetchAll(PDO::FETCH_ASSOC);
+
+
+// For for Creating New Activity
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $activityName = $_POST['activityName'];
+    $activityDescription = $_POST['activityDescription'];
+    $activityImg = $_POST['activityImg'];
+
+    $db = new DbConnection();
+    $pdo = $db->getConnection();
+
+    $sql = "INSERT INTO Activities (PhotoURL, Name, Description) VALUES (:img, :name, :description)";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([
+        ':img' => $activityImg,
+        ':name' => $activityName,
+        ':description' => $activityDescription
+    ]);
+
+    header("Location: adminDashboard.php");
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -67,12 +90,12 @@ $reservations = $stmt_reservations->fetchAll(PDO::FETCH_ASSOC);
 </button>
 
 <aside id="default-sidebar" class="fixed top-0 left-0 z-40 w-80 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
-    <div class="h-full overflow-y-auto bg-gray-50 dark:bg-gray-800">
+    <div class="h-full overflow-y-auto bg-black">
     <!-- Sidebar Menu -->
     <div class="flex flex-col">
-        <img src="https://images.rawpixel.com/image_social_landscape/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDI0LTA4L2thdGV2NjQ0N19waG90b19vZl93b29kZW5fZ2F2ZWxfaW5fdGhlX2NvdXJ0X2dhdmVsX3BsYWNlX29uX3RoZV83MmVhZDZjNS1lNGIxLTRlZDctYWIzNC03NThiMDVmZmY3YjRfMS5qcGc.jpg" alt="Lawyer Photo" class="object-cover">
+        <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438" alt="Cover" class="object-cover">
         <div class="px-3 py-4">
-            <h2 class="text-3xl font-semibold text-center text-white mb-6">LawyerUp</h2>
+            <h2 class="text-3xl font-semibold text-center text-white mb-6">FitBook</h2>
             <hr class="h-1 bg-gray-500 border-0 rounded dark:bg-gray-400">
         </div>
     </div>
@@ -111,23 +134,48 @@ $reservations = $stmt_reservations->fetchAll(PDO::FETCH_ASSOC);
 <!-- Main -->
 <div class="p-8 sm:ml-80">
 
-    <h2 class="text-2xl font-semibold text-gray-700 mb-6">Reservations</h2>
+    <h2 class="text-3xl font-semibold text-black mb-6">Add New Activity</h2>
+    <form method="POST" action="" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <div class="mb-4">
+            <label for="activityName" class="block text-gray-700 text-sm font-bold mb-2">Activity Name:</label>
+            <input type="text" id="activityName" name="activityName" required
+                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="mb-4">
+            <label for="activityDescription" class="block text-gray-700 text-sm font-bold mb-2">Description:</label>
+            <textarea id="activityDescription" name="activityDescription" rows="3" required
+                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+        </div>
+        <div class="mb-4">
+            <label for="activityImg" class="block text-gray-700 text-sm font-bold mb-2">Image:</label>
+            <input type="text" id="activityImg" name="activityImg" required
+                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <button type="submit"
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+            Add Activity
+        </button>
+    </form>
+
+    <h2 class="text-3xl font-semibold text-black mb-6">Reservations</h2>
     <div class="flex items-center justify-center overflow-x-auto">
         <table class="min-w-full table-auto border-collapse bg-white shadow-lg">
-            <thead class="bg-gray-50 dark:bg-gray-800">
+            <thead class="bg-black">
                 <tr>
                     <th class="px-6 py-3 text-left text-sm font-medium text-white">Member</th>
                     <th class="px-6 py-3 text-left text-sm font-medium text-white">Activity</th>
                     <th class="px-6 py-3 text-left text-sm font-medium text-white">Reservation Date</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-white">Status</th>
                     <th class="px-6 py-3 text-left text-sm font-medium text-white">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($reservations as $reservation): ?>
                     <tr class="border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-sm"><?php echo htmlspecialchars($reservation['MemberName'], ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td class="px-6 py-4 text-sm"><?php echo htmlspecialchars($reservation['ActivityName'], ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td class="px-6 py-4 text-sm"><?php echo htmlspecialchars($reservation['ResDate'], ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td class="px-6 py-4 text-sm"><?php echo $reservation['MemberName']; ?></td>
+                        <td class="px-6 py-4 text-sm"><?php echo $reservation['ActivityName']; ?></td>
+                        <td class="px-6 py-4 text-sm"><?php echo $reservation['ResDate']; ?></td>
+                        <td class="px-6 py-4 text-sm"><?php echo $reservation['Status']; ?></td>
                         <td class="px-6 py-4">
                             <form method="POST" action="" class="flex space-x-2">
                                 <input type="hidden" name="reservation_id" value="<?php echo $reservation['ResID']; ?>">
