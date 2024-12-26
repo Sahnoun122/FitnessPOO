@@ -27,7 +27,7 @@ CREATE TABLE Reservations (
     ResID INT AUTO_INCREMENT PRIMARY KEY,
     MemberID INT NOT NULL,
     ActivityID INT NOT NULL,
-    status ENUM('confirmed', 'cancelled', 'pending') DEFAULT 'pending',
+    status ENUM('Confirmed', 'Cancelled', 'Pending') DEFAULT 'Pending',
     ResDate DATETIME NOT NULL,
     FOREIGN KEY (MemberID) REFERENCES Members(MemberID),
     FOREIGN KEY (ActivityID) REFERENCES Activities(ActivityID)
