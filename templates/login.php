@@ -1,7 +1,8 @@
 <?php
-session_start();
 require_once '../models/classes.php';
 require_once '../config/db.php';
+
+session_start();
 
 $auth = new Auth();
 
