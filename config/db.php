@@ -1,28 +1,28 @@
 <?php
-class Database
-{
+class DbConnection{
+ 
     private $host = 'localhost';
     private $username = 'root';
     private $password = '';
     private $database = 'fitness';
-    private $pdo;
-    
-    public function __construct()
-    {
-        try {
+   
+    protected $connection;
+   
+    public function __construct(){
+ 
+        if (!isset($this->connection)) {
             $dsn = "mysql:host={$this->host};dbname={$this->database};charset=utf8mb4";
-            $this->pdo = new PDO($dsn, $this->username, $this->password);
-
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            die("Connection failed: " . $e->getMessage());
-        }
-    }
-    
-    public function getConnection()
-    {
-        return $this->pdo;
+            $this->connection = new PDO($dsn, $this->username, $this->password);
+            $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->connection->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+           
+            if (!$this->connection) {
+                echo 'Cannot connect to database server';
+                exit;
+            }            
+        }    
+       
+        return $this->connection;
     }
 }
 ?>
