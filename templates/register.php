@@ -1,4 +1,28 @@
 
+<?php
+require_once '../models/classes.php';
+require_once '../config/db.php';
+
+$auth = new Auth();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    $name = $_POST['name'];
+    $phone = $_POST['phone'];
+    $email = $_POST['email'];
+    $role = $_POST['role'];
+
+    try {
+        $userId = $auth->register($username, $password, $name, $phone, $email, $role);
+        echo "Registration successful. Your User ID is: $userId";
+        header('Location: login.php');
+        exit();
+    } catch (Exception $e) {
+        echo "Error: " . $e->getMessage();
+    }
+}
+?>
 
 <!DOCTYPE html>
 <html lang="en">
