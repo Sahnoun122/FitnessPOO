@@ -23,6 +23,7 @@ CREATE TABLE Activities (
     Description TEXT
 );
 
+
 CREATE TABLE Reservations (
     ResID INT AUTO_INCREMENT PRIMARY KEY,
     MemberID INT NOT NULL,
@@ -32,3 +33,8 @@ CREATE TABLE Reservations (
     FOREIGN KEY (MemberID) REFERENCES Members(MemberID),
     FOREIGN KEY (ActivityID) REFERENCES Activities(ActivityID)
 );
+
+-- inser into tables
+
+INSERT INTO `users`(`Username`, `Password`, `Role`) VALUES ('sahnoun','123','Admin');
+INSERT INTO `users`(`Username`, `Password`, `Role`) VALUES ('chamkhi','456','Member');
