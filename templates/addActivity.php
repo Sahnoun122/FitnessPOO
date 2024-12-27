@@ -85,6 +85,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_activity_id'])
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
+        <!-- AOS Animation CDN -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 </head>
 <body class="bg-gray-100">
 
@@ -140,39 +143,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_activity_id'])
 <!-- Main -->
 <div class="p-8 sm:ml-80">
 
-    <h2 class="text-4xl font-semibold text-black mb-6">Reservations</h2>
-    <div class="flex items-center justify-center overflow-x-auto">
-        <table class="min-w-full table-auto border-collapse bg-white shadow-lg">
-            <thead class="bg-black">
-                <tr>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-white">Member</th>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-white">Activity</th>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-white">Reservation Date</th>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-white">Status</th>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-white">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($reservations as $reservation): ?>
-                    <tr class="border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 text-sm"><?php echo $reservation['MemberName']; ?></td>
-                        <td class="px-6 py-4 text-sm"><?php echo $reservation['ActivityName']; ?></td>
-                        <td class="px-6 py-4 text-sm"><?php echo $reservation['ResDate']; ?></td>
-                        <td class="px-6 py-4 text-sm"><?php echo $reservation['Status']; ?></td>
-                        <td class="px-6 py-4">
-                            <form method="POST" action="" class="flex space-x-2">
-                                <input type="hidden" name="reservation_id" value="<?php echo $reservation['ResID']; ?>">
-                                <button name="action" value="accept" class="text-xl hover:scale-105">✅</button>
-                                <button name="action" value="reject" class="text-xl hover:scale-105">❌</button>
-                            </form>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+    <h2 class="text-4xl font-semibold text-black mb-6">Add New Activity</h2>
+    <div class="flex items-center justify-center my-8 bg-gray-100">
+        <div class="w-full mx-0 relative z-10 max-w-2xl lg:mt-0 lg:w-5/12">
+            <div class="p-10 bg-white shadow-2xl rounded-xl relative z-10" data-aos="fade-right">
+
+                <form method="POST" class="w-full mt-6 mr-0 mb-0 ml-0 relative space-y-8">
+                    <div class="relative">
+                        <p class="bg-white pt-0 pr-2 pb-0 pl-2 -mt-3 mr-0 mb-0 ml-2 font-medium text-gray-600
+                            absolute">Activity Name</p>
+                        <input type="text" id="activityName" name="activityName" required class="border placeholder-gray-400 focus:outline-none
+                            focus:border-black w-full pt-4 pr-4 pb-4 pl-4 mt-2 mr-0 mb-0 ml-0 text-base block bg-white
+                            border-gray-300 rounded-md"/>
+                    </div>
+                    <div class="relative">
+                        <p class="bg-white pt-0 pr-2 pb-0 pl-2 -mt-3 mr-0 mb-0 ml-2 font-medium text-gray-600
+                            absolute">Description</p>
+                        <textarea id="activityDescription" name="activityDescription" rows="3" required class="border placeholder-gray-400 focus:outline-none
+                            focus:border-black w-full pt-4 pr-4 pb-4 pl-4 mt-2 mr-0 mb-0 ml-0 text-base block bg-white
+                            border-gray-300 rounded-md"></textarea>
+                    </div>
+                    <div class="relative">
+                        <p class="bg-white pt-0 pr-2 pb-0 pl-2 -mt-3 mr-0 mb-0 ml-2 font-medium text-gray-600
+                            absolute">Image</p>
+                        <input type="text" id="activityImg" name="activityImg" required class="border placeholder-gray-400 focus:outline-none
+                            focus:border-black w-full pt-4 pr-4 pb-4 pl-4 mt-2 mr-0 mb-0 ml-0 text-base block bg-white
+                            border-gray-300 rounded-md"/>
+                    </div>
+                    <div class="relative">
+                        <button type="submit" class="w-full inline-block pt-4 pr-5 pb-4 pl-5 text-xl font-medium text-center text-white bg-green-500
+                            rounded-lg transition duration-200 hover:bg-green-600 ease">Add Activity</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <h2 class="text-4xl font-semibold text-black mb-10">Activities</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" style="align-items: start;">
+        <?php
+            $activities_sql = "SELECT * FROM Activities";
+            $stmt_activities = $pdo->query($activities_sql);
+            $activities = $stmt_activities->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($activities as $activity):
+        ?>
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
+            <img src="<?php echo $activity['PhotoURL']; ?>" alt="Activity Photo" class="w-full h-48 object-cover">
+            <div class="p-6">
+                <h3 class="text-4xl mb-4 font-semibold text-gray-900"><?php echo $activity['Name']; ?></h3>
+                <p class="text-lg text-gray-700"><?php echo $activity['Description']; ?></p>
+                <form method="POST" onsubmit="return confirm('Are you sure you want to delete this activity?');">
+                    <input type="hidden" name="delete_activity_id" value="<?php echo $activity['ActivityID']; ?>">
+                    <div class="flex items-center justify-center mt-4">
+                        <button type="submit" class="text-xl hover:scale-105">🗑️</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <?php endforeach; ?>
+
     </div>
 
 </div>
+
+<script>
+  AOS.init();
+</script>
 
 </body>
 </html>
