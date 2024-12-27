@@ -13,65 +13,22 @@ $admin_id = $_SESSION['user_id'];
 
 $db = new DbConnection();
 $pdo = $db->getConnection();
+$admin = new User($pdo);
 
-
-// Form for Reserving an Activity
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reservation_id'], $_POST['action'])) {
-    $reservation_id = $_POST['reservation_id'];
-    $action = $_POST['action'];
-    $status = ($action === 'accept') ? 'Confirmed' : 'Cancelled';
-
-    $update_sql = "UPDATE Reservations SET status = :status WHERE ResID = :reservation_id";
-    $stmt_update = $pdo->prepare($update_sql);
-    $stmt_update->execute([
-        ':status' => $status,
-        ':reservation_id' => $reservation_id
-    ]);
-
-    $_SESSION['message'] = "Reservation has been $status.";
-    header("Location: adminDashboard.php");
-    exit;
-}
-
-$reservations_sql = "SELECT r.ResID, r.ResDate, r.Status, u.Name AS MemberName, a.Name AS ActivityName 
-                    FROM Reservations r
-                    JOIN Members u ON r.MemberID = u.MemberID
-                    JOIN Activities a ON r.ActivityID = a.ActivityID";
-$stmt_reservations = $pdo->query($reservations_sql);
-$reservations = $stmt_reservations->fetchAll(PDO::FETCH_ASSOC);
-
-
-// For for Creating New Activity
+// Add New Activity
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['activityImg'])) {
     $activityName = $_POST['activityName'];
     $activityDescription = $_POST['activityDescription'];
     $activityImg = $_POST['activityImg'];
-
-    $db = new DbConnection();
-    $pdo = $db->getConnection();
-
-    $sql = "INSERT INTO Activities (PhotoURL, Name, Description) VALUES (:img, :name, :description)";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([
-        ':img' => $activityImg,
-        ':name' => $activityName,
-        ':description' => $activityDescription
-    ]);
-
-    header("Location: adminDashboard.php");
+    $admin->createActivity($activityName, $activityDescription, $activityImg);
+    header("Location: addActivity.php");
     exit;
 }
 
-// Form for deleting an Activity
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_activity_id'])) {
-    $activity_id = $_POST['delete_activity_id'];
-
-    $delete_sql = "DELETE FROM Activities WHERE ActivityID = :activity_id";
-    $stmt_delete = $pdo->prepare($delete_sql);
-
-    $stmt_delete->execute([':activity_id' => $activity_id]);
-
-    header("Location: adminDashboard.php");
+    $activityId = $_POST['delete_activity_id'];
+    $admin->deleteActivity($activityId);
+    header("Location: addActivity.php");
     exit;
 }
 ?>
