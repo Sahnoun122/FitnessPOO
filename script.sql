@@ -8,9 +8,6 @@ CREATE TABLE Users (
     Role ENUM('Admin', 'Member')
 );
 
-
-
-
 CREATE TABLE Members (
     MemberID INT PRIMARY KEY,
     Name VARCHAR(255) NOT NULL,
@@ -18,9 +15,6 @@ CREATE TABLE Members (
     Email VARCHAR(255) NOT NULL,
     FOREIGN KEY (MemberID) REFERENCES Users (UserID) ON DELETE CASCADE ON UPDATE CASCADE
 );
-
-
-
 
 CREATE TABLE Activities (
     ActivityID INT AUTO_INCREMENT PRIMARY KEY,
@@ -33,7 +27,7 @@ CREATE TABLE Reservations (
     ResID INT AUTO_INCREMENT PRIMARY KEY,
     MemberID INT NOT NULL,
     ActivityID INT NOT NULL,
-    status ENUM('confirmed', 'cancelled', 'pending') DEFAULT 'pending',
+    status ENUM('Confirmed', 'Cancelled', 'Pending') DEFAULT 'Pending',
     ResDate DATETIME NOT NULL,
     FOREIGN KEY (MemberID) REFERENCES Members(MemberID),
     FOREIGN KEY (ActivityID) REFERENCES Activities(ActivityID)
