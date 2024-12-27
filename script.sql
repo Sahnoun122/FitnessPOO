@@ -34,7 +34,9 @@ CREATE TABLE Reservations (
     FOREIGN KEY (ActivityID) REFERENCES Activities(ActivityID)
 );
 
--- inser table users
+-- inser into tables
 
-INSERT INTO `users`(`UserID`, `Username`, `Password`, `Role`) VALUES ('1','sahnoun','123','Admin');
-INSERT INTO `users`(`UserID`, `Username`, `Password`, `Role`) VALUES ('2','chamkhi','456','Member');
+INSERT INTO `users`(`Username`, `Password`, `Role`) VALUES ('sahnoun','123','Admin');
+INSERT INTO `users`(`Username`, `Password`, `Role`) VALUES ('chamkhi','456','Member');
+
+
