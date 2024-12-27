@@ -11,16 +11,27 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role
 
 $logged_in_user_id = $_SESSION['user_id'];
 
-
 $db = new DbConnection();
 $pdo = $db->getConnection();
+$member = new Member($pdo);
 
-$user_sql = "SELECT * FROM Members WHERE MemberID = :member_id";
-$stmt = $pdo->prepare($user_sql);
-$stmt->execute([':member_id' => $logged_in_user_id]);
-$user = $stmt->fetch();
+$user = $member->getMemberDetails($pdo, $logged_in_user_id);
 
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'cancel') {
+    $reservation_id = $_POST['reservation_id'];
+
+    $delete_sql = "DELETE FROM Reservations WHERE ResID = :reservation_id";
+    $stmt_delete = $pdo->prepare($delete_sql);
+
+    $stmt_delete->execute(['reservation_id' => $reservation_id]);
+
+    header("Location: memberReservations.php");
+    exit;
+}
+
+$activities = $member->getActivities($pdo);
+$reservations = $member->getAllReservations()
 ?>
 
 <!DOCTYPE html>
@@ -100,27 +111,6 @@ $user = $stmt->fetch();
 
 <div class="p-8 sm:ml-80">
     <h2 class="text-4xl font-semibold text-gray-700 mb-6">My Reservations</h2>
-        <?php
-            $reservations_sql = "SELECT r.ResID, r.ResDate, r.Status, a.Name AS ActivityName 
-                                FROM Reservations r
-                                JOIN Activities a ON r.ActivityID = a.ActivityID";
-            $stmt_reservations = $pdo->prepare($reservations_sql);
-            $stmt_reservations->execute();
-            $reservations = $stmt_reservations->fetchAll(PDO::FETCH_ASSOC);
-        ?>
-        <?php
-            if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'cancel') {
-                $reservation_id = $_POST['reservation_id'];
-
-                $delete_sql = "DELETE FROM Reservations WHERE ResID = :reservation_id";
-                $stmt_delete = $pdo->prepare($delete_sql);
-
-                $stmt_delete->execute(['reservation_id' => $reservation_id]);
-
-                header("Location: memberReservations.php");
-                exit;
-            }
-        ?>
 
         <div class="overflow-auto bg-white shadow-lg rounded-lg" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
             <table class="min-w-full table-auto border-collapse text-sm">

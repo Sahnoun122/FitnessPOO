@@ -11,37 +11,20 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role
 
 $logged_in_user_id = $_SESSION['user_id'];
 
-
 $db = new DbConnection();
 $pdo = $db->getConnection();
+$member = new Member($pdo);
 
-$user_sql = "SELECT * FROM Members WHERE MemberID = :member_id";
-$stmt = $pdo->prepare($user_sql);
-$stmt->execute([':member_id' => $logged_in_user_id]);
-$user = $stmt->fetch();
+$user = $member->getMemberDetails($pdo, $logged_in_user_id);
 
-if (!$user) {
-    $user = null;
-}
+$activities = $member->getActivities($pdo);
 
-$sql = "SELECT ActivityID, Name, Description, PhotoURL FROM Activities";
-$stmt_activities = $pdo->query($sql);
-
-
+// Reserve Activity
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $activity_id = $_POST['activity_id'];
     $reservation_date = $_POST['reservation_date'];
-    $member_id = $_SESSION['user_id'];
 
-    $sqlRes = "INSERT INTO Reservations (MemberID, ActivityID, `status`, ResDate) 
-               VALUES (:memberId, :activityId, :status, :resDate)";
-    $stmtRes = $pdo->prepare($sqlRes);
-    $stmtRes->execute([
-        ':memberId' => $member_id,
-        ':activityId' => $activity_id,
-        ':status' => 'pending',
-        ':resDate' => $reservation_date
-    ]);
+    $member->bookActivity($pdo, $logged_in_user_id, $activity_id, $reservation_date);
 }
 ?>
 
@@ -124,15 +107,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h2 class="text-4xl font-semibold text-gray-700 mb-10">Find & Book your Activity</h2>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" style="align-items: start;">
-        <?php while ($activity = $stmt_activities->fetch()): ?>
+        <?php foreach($activities as $activity): ?>
             <div class="bg-white shadow-lg rounded-lg overflow-hidden" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
-                <img src="<?php echo htmlspecialchars($activity['PhotoURL']); ?>" alt="Activity Photo" class="w-full h-48 object-cover">
+                <img src="<?php echo $activity['PhotoURL']; ?>" alt="Activity Photo" class="w-full h-48 object-cover">
                 <div class="p-6">
-                    <h3 class="text-4xl mb-4 font-semibold text-gray-900"><?php echo htmlspecialchars($activity['Name']); ?></h3>
-                    <p class="text-lg text-gray-700"><?php echo htmlspecialchars($activity['Description']); ?></p>
+                    <h3 class="text-4xl mb-4 font-semibold text-gray-900"><?php echo $activity['Name']; ?></h3>
+                    <p class="text-lg text-gray-700"><?php echo $activity['Description']; ?></p>
 
                     <form method="POST" action="" class="mt-4">
-                        <input type="hidden" name="activity_id" value="<?php echo htmlspecialchars($activity['ActivityID'], ENT_QUOTES, 'UTF-8'); ?>">
+                        <input type="hidden" name="activity_id" value="<?php echo $activity['ActivityID']; ?>">
                         <div class="flex items-center space-x-4">
                             <input type="datetime-local" name="reservation_date" required class="p-2 border border-gray-300 rounded-md w-full">
                             <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Book</button>
@@ -141,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 </div>
             </div>
-        <?php endwhile; ?>
+        <?php endforeach; ?>
     </div>
 </div>
 
