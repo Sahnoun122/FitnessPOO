@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="icon" href="../assets/media/court.png"/>
+    <link rel="icon" href="../assets/gym.png"/>
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- AOS Animation CDN -->
