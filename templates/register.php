@@ -1,4 +1,3 @@
-
 <?php
 require_once '../models/classes.php';
 require_once '../config/db.php';
@@ -15,7 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         $userId = $auth->register($username, $password, $name, $phone, $email, $role);
-        echo "Registration successful. Your User ID is: $userId";
         header('Location: login.php');
         exit();
     } catch (Exception $e) {
@@ -24,15 +22,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
-    <link rel="icon" href="../assets/media/court.png"/>
+    <link rel="icon" href="../assets/gym.png"/>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- AOS Animation CDN -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">

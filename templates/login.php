@@ -1,4 +1,3 @@
-
 <?php
 require_once '../models/classes.php';
 require_once '../config/db.php';
@@ -10,9 +9,6 @@ $auth = new Auth();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
-
-
-
 
     try {
         $user = $auth->login($username, $password);
@@ -38,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="icon" href="../assets/media/court.png"/>
+    <link rel="icon" href="../assets/gym.png"/>
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- AOS Animation CDN -->
@@ -73,7 +69,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             focus:border-black w-full pt-4 pr-4 pb-4 pl-4 mt-2 mr-0 mb-0 ml-0 text-base block bg-white
                             border-gray-300 rounded-md"/>
                     </div>
-
                     <div class="relative">
                         <p class="bg-white pt-0 pr-2 pb-0 pl-2 -mt-3 mr-0 mb-0 ml-2 font-medium text-gray-600
                             absolute">Password</p>
@@ -85,7 +80,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <button type="submit" class="w-full inline-block pt-4 pr-5 pb-4 pl-5 text-xl font-medium text-center text-white bg-green-500
                             rounded-lg transition duration-200 hover:bg-green-600 ease">Login</button>
                     </div>
-
                     <div class="relative">
                         <p class="text-center font-medium text-gray-600">You don't have an account, <a href="register.php" class="text-green-600 font-bold">Register</a></p>
                     </div>
@@ -97,10 +91,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
 
+
 <script>
-
-AOS.init();
-
+  AOS.init();
 </script>
 
 </body>

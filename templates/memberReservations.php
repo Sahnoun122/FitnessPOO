@@ -17,15 +17,21 @@ $member = new Member($pdo);
 
 $user = $member->getMemberDetails($pdo, $logged_in_user_id);
 
-$activities = $member->getActivities($pdo);
 
-// Reserve Activity
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $activity_id = $_POST['activity_id'];
-    $reservation_date = $_POST['reservation_date'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'cancel') {
+    $reservation_id = $_POST['reservation_id'];
 
-    $member->bookActivity($pdo, $logged_in_user_id, $activity_id, $reservation_date);
+    $delete_sql = "DELETE FROM Reservations WHERE ResID = :reservation_id";
+    $stmt_delete = $pdo->prepare($delete_sql);
+
+    $stmt_delete->execute(['reservation_id' => $reservation_id]);
+
+    header("Location: memberReservations.php");
+    exit;
 }
+
+$activities = $member->getActivities($pdo);
+$reservations = $member->getAllReservations()
 ?>
 
 <!DOCTYPE html>
@@ -76,17 +82,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </li>
         <li>
             <a href="memberDashboard.php" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-               <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
-                  <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z"/>
-                  <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z"/>
+               <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 18">
+                  <path d="M6.143 0H1.857A1.857 1.857 0 0 0 0 1.857v4.286C0 7.169.831 8 1.857 8h4.286A1.857 1.857 0 0 0 8 6.143V1.857A1.857 1.857 0 0 0 6.143 0Zm10 0h-4.286A1.857 1.857 0 0 0 10 1.857v4.286C10 7.169 10.831 8 11.857 8h4.286A1.857 1.857 0 0 0 18 6.143V1.857A1.857 1.857 0 0 0 16.143 0Zm-10 10H1.857A1.857 1.857 0 0 0 0 11.857v4.286C0 17.169.831 18 1.857 18h4.286A1.857 1.857 0 0 0 8 16.143v-4.286A1.857 1.857 0 0 0 6.143 10Zm10 0h-4.286A1.857 1.857 0 0 0 10 11.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 18 16.143v-4.286A1.857 1.857 0 0 0 16.143 10Z"/>
                </svg>
                <span class="ms-3">Dashboard</span>
             </a>
         </li>
         <li>
             <a href="memberReservations.php" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-               <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 18">
-                  <path d="M6.143 0H1.857A1.857 1.857 0 0 0 0 1.857v4.286C0 7.169.831 8 1.857 8h4.286A1.857 1.857 0 0 0 8 6.143V1.857A1.857 1.857 0 0 0 6.143 0Zm10 0h-4.286A1.857 1.857 0 0 0 10 1.857v4.286C10 7.169 10.831 8 11.857 8h4.286A1.857 1.857 0 0 0 18 6.143V1.857A1.857 1.857 0 0 0 16.143 0Zm-10 10H1.857A1.857 1.857 0 0 0 0 11.857v4.286C0 17.169.831 18 1.857 18h4.286A1.857 1.857 0 0 0 8 16.143v-4.286A1.857 1.857 0 0 0 6.143 10Zm10 0h-4.286A1.857 1.857 0 0 0 10 11.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 18 16.143v-4.286A1.857 1.857 0 0 0 16.143 10Z"/>
+                <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
+                  <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z"/>
+                  <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z"/>
                </svg>
                <span class="ms-3">Reservations</span>
             </a>
@@ -103,29 +109,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
    </div>
 </aside>
 
-<div class="flex-1 ml-0 sm:ml-80 p-8">
-    <h2 class="text-4xl font-semibold text-gray-700 mb-10">Find & Book your Activity</h2>
+<div class="p-8 sm:ml-80">
+    <h2 class="text-4xl font-semibold text-gray-700 mb-6">My Reservations</h2>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" style="align-items: start;">
-        <?php foreach($activities as $activity): ?>
-            <div class="bg-white shadow-lg rounded-lg overflow-hidden" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
-                <img src="<?php echo $activity['PhotoURL']; ?>" alt="Activity Photo" class="w-full h-48 object-cover">
-                <div class="p-6">
-                    <h3 class="text-4xl mb-4 font-semibold text-gray-900"><?php echo $activity['Name']; ?></h3>
-                    <p class="text-lg text-gray-700"><?php echo $activity['Description']; ?></p>
-
-                    <form method="POST" action="" class="mt-4">
-                        <input type="hidden" name="activity_id" value="<?php echo $activity['ActivityID']; ?>">
-                        <div class="flex items-center space-x-4">
-                            <input type="datetime-local" name="reservation_date" required class="p-2 border border-gray-300 rounded-md w-full">
-                            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Book</button>
-                        </div>
-                    </form>
-
-                </div>
-            </div>
-        <?php endforeach; ?>
-    </div>
+        <div class="overflow-auto bg-white shadow-lg rounded-lg" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
+            <table class="min-w-full table-auto border-collapse text-sm">
+                <thead class="bg-gray-50 dark:bg-gray-800">
+                    <tr>
+                        <th class="px-6 py-3 text-left font-medium text-white">Activity</th>
+                        <th class="px-6 py-3 text-left font-medium text-white">Reservation Date</th>
+                        <th class="px-6 py-3 text-left font-medium text-white">Status</th>
+                        <th class="px-6 py-3 text-left font-medium text-white">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($reservations as $reservation) : ?>
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-6 py-4"><?php echo $reservation['ActivityName']; ?></td>
+                            <td class="px-6 py-4"><?php echo $reservation['ResDate']; ?></td>
+                            <td class="px-6 py-4"><?php echo $reservation['Status']; ?></td>
+                            <td class="px-6 py-4">
+                                <form method="POST" class="flex space-x-2">
+                                    <input type="hidden" name="reservation_id" value="<?php echo $reservation['ResID']; ?>">
+                                    <button name="action" value="cancel" class="text-xl hover:scale-105">🗑️</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
 </div>
 
 <script>

@@ -3,7 +3,7 @@ require_once '../config/db.php';
 
 class Auth extends DbConnection {
 
-    public function register($username, $password, $firstname, $lastname, $phone, $email, $role = 'Member') {
+    public function register($username, $password, $name, $phone, $email, $role = 'Member') {
         try {
             $this->connection->beginTransaction();
 
@@ -18,17 +18,15 @@ class Auth extends DbConnection {
                 ':password' => $hashedPassword,
                 ':role' => $role
             ]);
-            
 
             $userId = $this->connection->lastInsertId();
 
             if ($role === 'Member') {
-                $sqlMember = "INSERT INTO Members (MemberID, FirstName, LastName, Phone, Email) VALUES (:id, :firstname, :lastname, :phone, :email)";
+                $sqlMember = "INSERT INTO Members (MemberID, Name, Phone, Email) VALUES (:id, :name, :phone, :email)";
                 $stmtMember = $this->connection->prepare($sqlMember);
                 $stmtMember->execute([
                     ':id' => $userId,
-                    ':firstname' => $firstname,
-                    ':lastname' => $lastname,
+                    ':name' => $name,
                     ':phone' => $phone,
                     ':email' => $email
                 ]);
@@ -64,63 +62,92 @@ class Auth extends DbConnection {
     }
 }
 
+
 class User {
+    private $pdo;
     protected $id;
     protected $username;
     protected $password;
     protected $role;
 
-    public function __construct($id, $username, $password, $role) {
+    public function __construct($pdo) {
+        $this->pdo = $pdo;
+    }
+
+    public function setUser($id, $username, $password, $role) {
         $this->id = $id;
         $this->username = $username;
         $this->password = $password;
         $this->role = $role;
     }
 
-    public function getId() {
+    public function getUserId() {
         return $this->id;
     }
     public function getUsername() {
         return $this->username;
     }
-    public function getPassword() {
+    public function getUserPassword() {
         return $this->password;
     }
-    public function getRole() {
+    public function getUserRole() {
         return $this->role;
     }
 
-    public function setUsername($username) {
-        $this->username = $username;
+    // Reservation Methods
+    public function getAllReservations() {
+        $sql = "SELECT r.ResID, r.ResDate, r.Status, u.Name AS MemberName, a.Name AS ActivityName 
+                FROM Reservations r
+                JOIN Members u ON r.MemberID = u.MemberID
+                JOIN Activities a ON r.ActivityID = a.ActivityID";
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    public function setPassword($password) {
-        $this->password = $password;
+
+    public function updateReservationStatus($reservationId, $action) {
+        $status = ($action === 'accept') ? 'Confirmed' : 'Cancelled';
+        $sql = "UPDATE Reservations SET status = :status WHERE ResID = :reservation_id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':status' => $status,
+            ':reservation_id' => $reservationId,
+        ]);
     }
-    public function setRole($role) {
-        $this->role = $role;
+
+    // Activity Methods
+    public function createActivity($activityName, $activityDescription, $activityImg) {
+        $sql = "INSERT INTO Activities (PhotoURL, Name, Description) VALUES (:img, :name, :description)";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':img' => $activityImg,
+            ':name' => $activityName,
+            ':description' => $activityDescription,
+        ]);
+    }
+
+    public function deleteActivity($activityId) {
+        $sql = "DELETE FROM Activities WHERE ActivityID = :activity_id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':activity_id' => $activityId]);
     }
 }
 
 
+
 class Member extends User {
-    private $firstname;
-    private $lastname;
+    private $name;
     private $phone;
     private $email;
 
-    public function __construct($id, $username, $password, $firstname, $lastname, $phone, $email) {
-        parent::__construct($id, $username, $password, 'Member');
-        $this->firstname = $firstname;
-        $this->lastname = $lastname;
+    public function setMember($id, $username, $password, $name, $phone, $email) {
+        parent::setUser($id, $username, $password, 'Member');
+        $this->name = $name;
         $this->phone = $phone;
         $this->email = $email;
     }    
 
-    public function getFirstName() {
-        return $this->firstname;
-    }
-    public function getLastName() {
-        return $this->lastname;
+    public function getName() {
+        return $this->name;
     }
     public function getPhone() {
         return $this->phone;
@@ -129,99 +156,34 @@ class Member extends User {
         return $this->email;
     }
 
-
-    public function setFirstName($firstname) {
-        $this->firstname = $firstname;
-    }
-    public function setLastName($lastname) {
-        $this->lastname = $lastname;
-    }
-    public function setPhone($phone) {
-        $this->phone = $phone;
-    }
-    public function setEmail($email) {
-        $this->email = $email;
+    public function memberInfo() {
+        return "Member: {$this->name}, Email: {$this->email}, Phone: {$this->phone}";
     }
 
-    public function afficherInformations() {
-        return "Member: {$this->firstname} {$this->lastname}, Email: {$this->email}, Phone: {$this->phone}";
-    }
-}
-
-
-
-class Activity {
-    private $id;
-    private $name;
-    private $description;
-
-    public function __construct($id, $name, $description) {
-        $this->id = $id;
-        $this->name = $name;
-        $this->description = $description;
+    public function getMemberDetails($pdo, $memberId) {
+        $sql = "SELECT * FROM Members WHERE MemberID = :member_id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([':member_id' => $memberId]);
+        return $stmt->fetch();
     }
 
-    public function getId() {
-        return $this->id;
-    }
-    public function getName() {
-        return $this->name;
-    }
-    public function getDescription() {
-        return $this->description;
-    }
-
-    public function setName($name) {
-        $this->name = $name;
-    }
-    public function setDescription($description) {
-        $this->description = $description;
-    }
-}
-
-
-class Reservation {
-    private $id;
-    private $memberId;
-    private $activityId;
-    private $status;
-    private $reservationDate;
-
-    public function __construct($id, $memberId, $activityId, $status, $reservationDate) {
-        $this->id = $id;
-        $this->memberId = $memberId;
-        $this->activityId = $activityId;
-        $this->status = $status;
-        $this->reservationDate = $reservationDate;
+    public function bookActivity($pdo, $memberId, $activityId, $reservationDate) {
+        $sql = "INSERT INTO Reservations (MemberID, ActivityID, `status`, ResDate) 
+                VALUES (:memberId, :activityId, :status, :resDate)";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            ':memberId' => $memberId,
+            ':activityId' => $activityId,
+            ':status' => 'pending',
+            ':resDate' => $reservationDate
+        ]);
+        return $stmt->rowCount() > 0;
     }
 
-    public function getId() {
-        return $this->id;
-    }
-    public function getMemberId() {
-        return $this->memberId;
-    }
-    public function getActivityId() {
-        return $this->activityId;
-    }
-    public function getStatus() {
-        return $this->status;
-    }
-    public function getReservationDate() {
-        return $this->reservationDate;
-    }
-
-    public function setMemberId($memberId) {
-        $this->memberId = $memberId;
-    }
-    public function setActivityId($activityId) {
-        $this->activityId = $activityId;
-    }
-    public function setStatus($status) {
-        $this->status = $status;
-    }
-    public function setReservationDate($reservationDate) {
-        $this->reservationDate = $reservationDate;
+    public function getActivities($pdo) {
+        $sql = "SELECT ActivityID, Name, Description, PhotoURL FROM Activities";
+        $stmt = $pdo->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
 
