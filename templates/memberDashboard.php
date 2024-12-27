@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <img src="https://hips.hearstapps.com/hmg-prod/images/701/articles/2017/01/how-much-joining-gym-helps-health-2-jpg-1488906648.jpeg" alt="Lawyer Photo" class="object-cover">
         <div class="px-3 py-4">
             <h2 class="text-3xl font-semibold text-center text-white mb-6">FitBook</h2>
-            <hr class="h-1 bg-gray-500 border-0 rounded dark:bg-gray-400">
+            <hr class="h-1 bg-white border-0 rounded dark:bg-gray-400">
         </div>
     </div>
 
@@ -104,15 +104,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </aside>
 
 <div class="flex-1 ml-0 sm:ml-80 p-8">
-    <h2 class="text-4xl font-semibold text-gray-700 mb-10">Find & Book your Activity</h2>
+    <h2 class="text-4xl font-semibold text-black mb-10">Find & Book your Activity</h2>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" style="align-items: start;">
         <?php foreach($activities as $activity): ?>
-            <div class="bg-white shadow-lg rounded-lg overflow-hidden" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
+            <div class="bg-black shadow-lg rounded-lg overflow-hidden" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
                 <img src="<?php echo $activity['PhotoURL']; ?>" alt="Activity Photo" class="w-full h-48 object-cover">
                 <div class="p-6">
-                    <h3 class="text-4xl mb-4 font-semibold text-gray-900"><?php echo $activity['Name']; ?></h3>
-                    <p class="text-lg text-gray-700"><?php echo $activity['Description']; ?></p>
+                    <h3 class="text-4xl mb-4 font-semibold text-white"><?php echo $activity['Name']; ?></h3>
+                    <p class="text-lg text-white"><?php echo $activity['Description']; ?></p>
 
                     <form method="POST" action="" class="mt-4">
                         <input type="hidden" name="activity_id" value="<?php echo $activity['ActivityID']; ?>">

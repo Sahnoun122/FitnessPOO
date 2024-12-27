@@ -58,7 +58,7 @@ $reservations = $admin->getAllReservations();
         <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438" alt="Cover" class="object-cover">
         <div class="px-3 py-4">
             <h2 class="text-3xl font-semibold text-center text-white mb-6">FitBook</h2>
-            <hr class="h-1 bg-gray-500 border-0 rounded dark:bg-gray-400">
+            <hr class="h-1 bg-white border-0 rounded dark:bg-gray-400">
         </div>
     </div>
 
@@ -97,8 +97,8 @@ $reservations = $admin->getAllReservations();
 <div class="p-8 sm:ml-80">
 
     <h2 class="text-4xl font-semibold text-black mb-6">Reservations</h2>
-    <div class="flex items-center justify-center overflow-x-auto" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
-        <table class="min-w-full table-auto border-collapse bg-white shadow-lg">
+    <div class="flex items-center justify-center overflow-x-auto shadow-lg rounded-lg" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
+        <table class="min-w-full table-auto border-collapse bg-white">
             <thead class="bg-black">
                 <tr>
                     <th class="px-6 py-3 text-left text-sm font-medium text-white">Member</th>
