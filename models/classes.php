@@ -62,42 +62,76 @@ class Auth extends DbConnection {
     }
 }
 
+
 class User {
+    private $pdo;
     protected $id;
     protected $username;
     protected $password;
     protected $role;
 
-    public function __construct($id, $username, $password, $role) {
+    public function __construct($pdo) {
+        $this->pdo = $pdo;
+    }
+
+    public function setUser($id, $username, $password, $role) {
         $this->id = $id;
         $this->username = $username;
         $this->password = $password;
         $this->role = $role;
     }
 
-    public function getId() {
+    public function getUserId() {
         return $this->id;
     }
     public function getUsername() {
         return $this->username;
     }
-    public function getPassword() {
+    public function getUserPassword() {
         return $this->password;
     }
-    public function getRole() {
+    public function getUserRole() {
         return $this->role;
     }
 
-    public function setUsername($username) {
-        $this->username = $username;
+    // Reservation Methods
+    public function getAllReservations() {
+        $sql = "SELECT r.ResID, r.ResDate, r.Status, u.Name AS MemberName, a.Name AS ActivityName 
+                FROM Reservations r
+                JOIN Members u ON r.MemberID = u.MemberID
+                JOIN Activities a ON r.ActivityID = a.ActivityID";
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    public function setPassword($password) {
-        $this->password = $password;
+
+    public function updateReservationStatus($reservationId, $action) {
+        $status = ($action === 'accept') ? 'Confirmed' : 'Cancelled';
+        $sql = "UPDATE Reservations SET status = :status WHERE ResID = :reservation_id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':status' => $status,
+            ':reservation_id' => $reservationId,
+        ]);
     }
-    public function setRole($role) {
-        $this->role = $role;
+
+    // Activity Methods
+    public function createActivity($activityName, $activityDescription, $activityImg) {
+        $sql = "INSERT INTO Activities (PhotoURL, Name, Description) VALUES (:img, :name, :description)";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':img' => $activityImg,
+            ':name' => $activityName,
+            ':description' => $activityDescription,
+        ]);
+    }
+
+    public function deleteActivity($activityId) {
+        $sql = "DELETE FROM Activities WHERE ActivityID = :activity_id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':activity_id' => $activityId]);
     }
 }
+
 
 
 class Member extends User {
@@ -105,8 +139,8 @@ class Member extends User {
     private $phone;
     private $email;
 
-    public function __construct($id, $username, $password, $name, $phone, $email) {
-        parent::__construct($id, $username, $password, 'Member');
+    public function setMember($id, $username, $password, $name, $phone, $email) {
+        parent::setUser($id, $username, $password, 'Member');
         $this->name = $name;
         $this->phone = $phone;
         $this->email = $email;
@@ -122,18 +156,7 @@ class Member extends User {
         return $this->email;
     }
 
-
-    public function setName($name) {
-        $this->name = $name;
-    }
-    public function setPhone($phone) {
-        $this->phone = $phone;
-    }
-    public function setEmail($email) {
-        $this->email = $email;
-    }
-
-    public function afficherInformations() {
+    public function memberInfo() {
         return "Member: {$this->name}, Email: {$this->email}, Phone: {$this->phone}";
     }
 }
